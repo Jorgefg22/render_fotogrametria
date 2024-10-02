@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<title>DCMAT.GAMS</title>
+	<link rel="icon" href="/images/favicon.png"  type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="/libs/potree/potree.css">
+	<link rel="stylesheet" type="text/css" href="/libs/jquery-ui/jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="/libs/openlayers3/ol.css">
+	<link rel="stylesheet" type="text/css" href="/libs/spectrum/spectrum.css">
+	<link rel="stylesheet" type="text/css" href="/libs/jstree/themes/mixed/style.css">
+	<link rel="stylesheet" type="text/css" href="/library/style.css">
+
+</head>
+
+<body>
+	<script src="/libs/jquery/jquery-3.1.1.min.js"></script>
+	<script src="/libs/spectrum/spectrum.js"></script>
+	<script src="/libs/jquery-ui/jquery-ui.min.js"></script>
+	<script src="/libs/three.js/build/three.min.js"></script>
+	<script src="/libs/three.js/extra/lines.js"></script>
+	<script src="/libs/other/BinaryHeap.js"></script>
+	<script src="/libs/tween/tween.min.js"></script>
+	<script src="/libs/d3/d3.js"></script>
+	<script src="/libs/proj4/proj4.js"></script>
+	<script src="/libs/openlayers3/ol.js"></script>
+	<script src="/libs/i18next/i18next.js"></script>
+	<script src="/libs/jstree/jstree.js"></script>
+	<script src="/libs/potree/potree.js"></script>
+	<script src="/libs/plasio/js/laslaz.js"></script>
+	<script>
+		function openNewWindow() {
+		   // Intentar abrir una nueva ventana con dimensiones específicas
+		   var newWindow = window.open(
+			   'http://catastro.municipio.local/users/help2', 
+			   'newWindow', 
+			   'width=600,height=600,top=200,left=200,resizable=yes'
+		   );
+
+		   if (newWindow) {
+			   // La nueva ventana se abrió correctamente
+			   console.log('Nueva ventana abierta.');
+		   } else {
+			   // La ventana no se pudo abrir, probablemente bloqueada por un bloqueador de pop-ups
+			   alert('No se pudo abrir la nueva ventana. Por favor, deshabilite el bloqueador de pop-ups e intente de nuevo.');
+		   }
+	   }
+   </script>
+	
+	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
+	<!-- INCLUDE SETTINGS HERE -->
+
+
+	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
+		<div id="potree_render_area" style="background-image: url(`../build/potree/resources/images/background.jpg`);">
+			<div id="provide_system" style="position: absolute; z-index: 10; color: rgb(255, 255, 255); bottom: 15px; left: calc(50% - 130px); opacity: 0.5;">Gobierno Autonomo Municipal de SACABA</div>
+			<div id="sidebar_logo"></div>
+			<div id="potree_description" class="potree_info_text">Point cloud courtesy of <a target="_blank" href="https://www.sigeom.ch/">sigeom sa</a></div>
+		</div>
+		<div id="potree_sidebar_container"> </div>
+	</div>
+
+	<!--script>
+
+		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
+
+		viewer.setEDLEnabled(true);
+		viewer.setFOV(60);
+		viewer.setPointBudget(2_000_000);
+		// INCLUDE SETTINGS HERE --
+		viewer.loadSettingsFromURL();
+
+		viewer.setDescription("");
+
+		viewer.loadGUI(() => {
+			viewer.setLanguage("es");
+			$("#menu_appearance").next().show();
+			$("#menu_tools").next().show();
+			$("#menu_clipping").next().show();
+			viewer.toggleSidebar();
+		});
+
+		Potree.loadPointCloud("/pointclouds/21/metadata.json", "21", e => {
+			let scene = viewer.scene;
+			let pointcloud = e.pointcloud;
+
+			let material = pointcloud.material;
+			material.size = 1;
+			material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+			material.shape = Potree.PointShape.SQUARE;
+			material.activeAttributeName = "rgba";
+
+			scene.addPointCloud(pointcloud);
+
+			viewer.fitToScreen();
+		});
+
+	</script>
+</body>
+
+</html>

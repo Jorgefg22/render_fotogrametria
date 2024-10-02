@@ -1,0 +1,99 @@
+<%- include("partials/header"); -%>
+<div style="background-color: #27303b; border-radius: 15px; width: 300px;" class="text-center">
+  <img
+    class="mb-4"
+    src="/images/favicon.png"
+    alt=""
+    width="72"
+    height="72"
+    style="margin-top: 25px;"
+  />
+  <form class="form-register" action="/users/register" method="POST">
+    <h6 class="h6 mb-3 font-weight-normal" style="color: white;">REGISTRO DE USUARIO</h6>
+
+    <label for="name" class="sr-only">Nombre</label>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      class="form-control"
+      placeholder="Nombre Completo"
+      required
+      autofocus
+      style="background-color: #27303b; border-color: #27303b; color: white;"
+    />
+
+    <!-- Actualización: Cambio de Email por Username -->
+    <label for="username" class="sr-only">Nombre de Usuario</label>
+    <input
+      type="text"
+      id="username"
+      name="username"
+      class="form-control"
+      placeholder="Nombre de Usuario"
+      required
+      autofocus
+      style="background-color: #27303b; border-color: #27303b; color: white;"
+    />
+
+    <label for="password" class="sr-only">Contraseña</label>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      class="form-control"
+      placeholder="Contraseña"
+      required
+      style="background-color: #27303b; border-color: #27303b; color: white;"
+    />
+  
+    <label for="password_confirm" class="sr-only">Confirmar Contraseña</label>
+    <input
+      type="password"
+      id="password_confirm"
+      name="password_confirm"
+      class="form-control"
+      placeholder="Confirmar Contraseña"
+      required
+      style="background-color: #27303b; border-color: #27303b; color: white;"
+    /><br />
+
+ <!-- Agregando el campo de selección de rol -->
+ <label for="role" class="sr-only">Rol</label>
+ <select
+   id="role"
+   name="role"
+   class="form-control"
+   required
+   style="background-color: #27303b; border-color: #27303b; color: white;"
+ >
+   <option value="" disabled selected>Seleccionar Rol</option>
+   <option value="admin">Administrador</option>
+   <option value="editor">Editor</option>
+   <option value="lector">Lector</option>
+   <option value="root">Root</option>
+ </select><br />
+
+
+    <input
+      type="submit"
+      value="Register"
+      class="btn btn-lg btn-primary btn-block"
+    ></input>
+
+    <p class="help-block mb-3 text-muted">
+      <% if (typeof errors != 'undefined') { %>
+        <% errors.forEach(error => { %>
+          <p class="help-block mb-3 text-muted">*<%= error.message %></p>
+        <% }) %>
+      <% } %>
+    </p>
+
+    <p class="help-block mb-3 text-muted">
+      Already registered...!
+      <a href="/users/login"> Sign In </a>
+    </p>
+  </form>
+</div>
+
+<!--%- include("partials/footer"); -%-->

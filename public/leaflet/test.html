@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet GeoJSON Popup Example</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="./ORTOMOSAICO2023/ECW_D1/101.ecw"></script>
+  
+</head>
+<body>
+
+
+    <button></button>
+<div id="map" style="width: 100%; height: 1100px;"></div>
+
+
+<a href="file.geojson" class="btn btn-warning btn-sm" role="button">Nube de Puntos 3D</a>
+
+
+
+
+
+
+<script>
+    var map = L.map('map').setView([-17.403868804926827, -66.03924367573562], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
+
+    // Load GeoJSON data from a file
+    fetch('./file.geojson')
+        .then(response => response.json())
+        .then(data => {
+            L.geoJSON(data, {
+                onEachFeature: function (feature, layer) {
+                    if (feature.properties && feature.properties.id && feature.properties.distrito) {
+                        layer.bindPopup('<b>' + feature.properties.id + '</b><br>' + feature.properties.distrito + '</b><br>'+feature.properties.numero );
+                    }
+                }
+            }).addTo(map);
+        });
+
+</script>
+
+</body>
+</html>

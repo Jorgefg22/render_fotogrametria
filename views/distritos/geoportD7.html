@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Geoinformatica-Castastro</title>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+		integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+		crossorigin="" />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/style.css" />
+	<link href="/css/style.css" rel="stylesheet" />
+
+	<link rel="icon" href="/images/favico2.png" type="image/x-icon">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
+
+</head>
+
+<body style="overflow: hidden;">
+	<script>
+	
+	</script>
+
+	<nav class="navbar navbar-expand-lg navbar-light  p-3">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#"><img src="/images/logo-sacaba.png" alt=""></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+				aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class=" collapse navbar-collapse" id="navbarNavDropdown">
+				<ul class="navbar-nav ms-auto ">
+
+
+					<li class="nav-item">
+						<!--a class="nav-link mx-2" href="#">CATASTRO MULTIFINALITARIO</a-->
+						<h3 style="text-align: center; color: aliceblue;">DIRECCION DE CATASTRO MULTIFINALITARIO Y
+							ADMINISTRACION DE TIERRAS</h3>
+						<h4 style="text-align: center; color: aliceblue;">FOTOGRAMETRIA 2D - 3D</h4>
+					</li>
+
+				</ul>
+				<ul class="navbar-nav ms-auto d-none d-lg-inline-flex">
+					<a class="navbar-brand" href="#"><img src="/images/SIGAMOSADELANTE.png" alt=""></a>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+
+	<nav class="navbar navbar-light" style="background-color: #08477b; height: 35px; ">
+		<!-- Navbar content -->
+		<div class=" search"  style="margin-left: 10px; margin-top: -8px;">
+			<input title="814585.34,8073319.62" id="search" type="text" placeholder="Insertar coordenadas X,Y" style="border-radius: 5px; margin-bottom: 10px;">
+			<button id="search-btn" onclick="search()" style="border-radius: 5px;">Buscar</button>
+
+			<button class="upload-btn" style="background-color: #08477b; border-style: none;" onclick="document.getElementById('fileInput').click()">
+				<img src="/images/sub.png" alt="" width="30px" height="30px">
+			  </button>
+			  <input type="file" id="fileInput" style="display: none;">
+			  
+		</div>
+		<div>
+			<label id = "usuario"style="color: aliceblue;margin-bottom: 10px;"><%= user %></label>
+			<i class="fa-regular fa-user fa-2xl" style="color: #ededed;" data-bs-toggle="offcanvas"
+				data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" onclick="addNametocircle()"></i>
+
+			<a title="cerrar sesion" style="margin-bottom: 10px; margin-right: 10px; " href="/users/logout">
+				<img src="/images/cerrar-sesion.png"  title="cerrar sesion" alt="" height="20px" width="20px" style="margin-bottom: 7px;">
+			</a>
+			<!--h6 style="margin-left: 10px; color: aliceblue;"> <%= user %></h6-->
+		</div>
+		
+
+	</nav>
+
+
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+		<div class="offcanvas-header" style="background-color: #08477b;">
+
+			<img src="https://raw.githubusercontent.com/Jorgefg22/visaciones-final/jorge/src/assets/img-log/admti.png"
+				alt="" height="70%">
+			<button type="button" class="btn" data-bs-dismiss="offcanvas" aria-label="Close"> <img src="" alt="">
+				<img src="/images/cerrar.png" title="cerrar sesion" alt="" height="20px" width="20px"
+					style="margin-bottom: 22px;">
+			</button>
+		</div>
+		<div class="offcanvas-body">
+
+			<div class="container" style="display: flex; justify-content: center; align-items: center;">
+				<div class="circulo">
+					<br>
+
+					<h1 id="imagecircle" style="text-align: center; color: aliceblue;"></h1>
+				</div>
+			</div>
+
+			<div style="text-align: center; color: darkgrey;">
+				<label id="role">
+					<%= role %>
+				</label>
+			</div>
+
+			<h4 style="text-align: center;">
+				<%= user %>
+			</h4>
+			<hr style="background-color:  #08477b;
+					  height: 2px;
+					  margin: none;
+					  border: none;
+					  opacity: 2;
+					">
+
+			<div class="d-grid gap-2">
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#descargasModal">
+					Ver Descargas
+				  </button>
+				  <div class="dropdown" id="dropdown" style="display: none;">
+					<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
+						data-bs-toggle="dropdown" aria-expanded="false" style="width: 100%;">
+						Distritos
+					</button>
+					<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" style="width: 100%; text-align: center;">
+						<li><a class="dropdown-item" href="/users/geoportD1">Distrito - 1</a></li>
+						<li><a class="dropdown-item" href="/users/geoportD2">Distrito - 2</a></li>
+						<li><a class="dropdown-item" href="/users/geoportD3">Distrito - 3</a></li>
+						<li><a class="dropdown-item" href="/users/geoportD4">Distrito - 4</a></li>
+						<li><a class="dropdown-item" href="/users/geoportD6">Distrito - 6</a></li>
+						<li><a class="dropdown-item" href="/users/geoport">Vista General</a></li>
+						<li><a class="dropdown-item" href="/users/geoportDLL">Distrito - LL</a></li>
+					</ul>
+				</div>
+			</div>
+
+
+			<div>
+				<button  onclick="window.location.href='/users/logout'"
+					style="	background-color: white; position: fixed; width: 400px; height: 40px; bottom:5px; margin-left: -17px; border-bottom: none;">
+					<img src="/images/cerrar-sesion2.png" alt="" title="cerrar sesion" alt="" height="40px"
+						width="40px"> <label for="">cerrar sesion</label>
+				</button>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="descargasModal" tabindex="-1" aria-labelledby="descargasModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="descargasModalLabel">Mis Descargas</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<table class="table table-striped">
+						<thead>
+							<tr style="background-color:  #08477b; color: white;">
+								<!--th>ID</th-->
+								<th>Archivo</th>
+								<!--th>Tamaño</th-->
+								<th>Fecha y Hora</th>
+								<th>Resultado</th>
+							</tr>
+						</thead>
+						<tbody id="descargasTableBody">
+							<!-- Las descargas se cargarán aquí dinámicamente -->
+						</tbody>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	
+	<div id="map"></div>
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+		crossorigin=""></script>
+	<img src="" alt="">
+
+	<script src="/script/distritos/distritro7.js"></script>
+	<script src="/script/script2.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>

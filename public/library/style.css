@@ -1,0 +1,22 @@
+#sidebar_logo {
+    /*background:url(../img/ATCATASTRO2.png) no-repeat;*/
+    background:url(/images/logocatastro1.png) no-repeat;
+    /*background:url(../img/logodorado.png) no-repeat;*/
+    height: 100px;
+    background-size: cover;
+    cursor: pointer;
+    width: 100px;
+    right: 15px;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    position: absolute;
+    z-index: 10;
+}
+
+#compas{
+    display: block;
+}
+
+
+
+

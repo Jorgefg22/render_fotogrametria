@@ -1,0 +1,59 @@
+<%- include("partials/header"); -%>
+
+<div style="background-color: #27303b; border-radius: 15px; width: 300px;" class="text-center">
+  <img
+    class="mb-4 "
+    src="/images/favicon.png"
+    alt=""
+    width="150"
+    height="150"
+    style="margin-top: 25px;" 
+  />
+  <p>
+    <% if(messages.success_msg) { %>
+    <p class="help-block mb-3 text-muted"><%= messages.success_msg %></p>
+    <% } %>
+  </p>
+  <p>
+    <% if (messages.error) { %>
+    <p class="help-block mb-3 text-muted"><%= messages.error %></p>
+    <% } %>
+  </p>
+
+  <form class="form-signin" action="/users/login" method="POST">
+    <h6 class="h6 mb-3 font-weight-normal" style="color: white;">INICIO DE SESIÓN</h6>
+
+    <!-- Cambiado de Correo a Usuario -->
+    <label for="username" class="sr-only">Usuario</label>
+    <input
+      type="text"  
+      id="inputUsername"  
+      name="username"  
+      class="form-control"
+      placeholder="Nombre de Usuario"  
+      required
+      autofocus
+      style="background-color: #27303b; border-color: #27303b; color: white;"
+    />
+    <br>
+
+    <label for="password" class="sr-only">Contraseña</label>
+    <input
+      type="password"
+      id="inputPassword"
+      name="password"
+      class="form-control"
+      placeholder="Contraseña"
+      required
+      style="background-color: #27303b; border-color: #27303b; color: white;"
+    />
+    <br>
+    <input type="submit" value="Acceder" class="btn btn-primary btn-block" style="margin-right: 3px;">
+    </input>
+    <p class="help-block mt-5 mb-3 text-muted">
+      <!--a href="/users/register"> Register </a-->
+    </p>
+  </form>
+</div>
+
+<!--%- include("partials/footer"); -%>

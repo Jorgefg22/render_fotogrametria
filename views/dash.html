@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Map with Sidebar and Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.css" />
+    <style>
+        #map { height: 100vh; width: 70vw; float: left; }
+        #dashboard { height: 100vh; width: 30vw; float: right; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="dashboard">
+        <h2>Statistics Dashboard</h2>
+        <canvas id="statsChart"></canvas>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var map = L.map('map').setView([-17.403868804926827, -66.03924367573562], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+        
+        // Replace this with the URL of your GeoJSON file on GitHub
+        var geojsonUrl = 'http://10.0.38.17:8080/geoserver/fotogrametria_sacaba/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=fotogrametria_sacaba%3AGrilla%20Area%20Urbana%202024&maxFeatures=500&outputFormat=application%2Fjson&srsName=EPSG:4326'
+
+        fetch(geojsonUrl)
+            .then(response => response.json())
+            .then(geojsonData => {
+                L.geoJSON(geojsonData, {
+                    onEachFeature: function (feature, layer) {
+                        layer.on('click', function () {
+                            updateSidebar(feature);
+                        });
+                    }
+                }).addTo(map);
+
+                // Prepare data for the chart
+                var labels = ["1", "4", "7", "LL"];
+                var dataCounts = {
+                    "1": 0,
+                    "4": 0,
+                    "7": 0,
+                    "LL": 0
+                };
+
+                geojsonData.features.forEach(function(feature) {
+                    var distrito = feature.properties.distrito_a;
+                    if (dataCounts[distrito] !== undefined) {
+                        dataCounts[distrito]++;
+                    }
+                });
+
+                var chartData = {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Estado Acumulativo',
+                        data: labels.map(function(label) { return dataCounts[label]; }),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                };
+
+                var ctx = document.getElementById('statsChart').getContext('2d');
+                var statsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading GeoJSON data:', error));
+
+        function updateSidebar(feature) {
+            var sidebarContent = '<h3>Feature Details</h3>';
+            for (var property in feature.properties) {
+                sidebarContent += '<p><strong>' + property + ':</strong> ' + feature.properties[property] + '</p>';
+            }
+            document.getElementById('dashboard').innerHTML = sidebarContent;
+        }
+    </script>
+</body>
+</html>
