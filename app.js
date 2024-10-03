@@ -390,6 +390,48 @@ app.get('/users/descargados', checkNotAuthenticated, async (req, res) => {
   }
 });
 
+
+
+app.get('/poligonos', async (req, res) => {
+  try {
+    const query = `
+      SELECT id, ST_AsGeoJSON(ST_Transform(geom, 4326)) AS geom, texto, distrito_a, estado_acumulativo, fecha_levantamiento
+      FROM public.grilla2024
+    `;
+    const result = await pool.query(query);
+
+    if (result.rows.length > 0) {
+      // Crear una colección de Features (GeoJSON FeatureCollection)
+      const featureCollection = {
+        type: "FeatureCollection",
+        features: result.rows.map(row => ({
+          type: "Feature",
+          geometry: JSON.parse(row.geom),  // GeoJSON Geometry
+          properties: {
+            id: row.id,
+            texto: row.texto,
+            distrito_a: row.distrito_a,
+            estado_acumulativo: row.estado_acumulativo,
+            fecha_levantamiento: row.fecha_levantamiento
+          }
+        }))
+      };
+
+      res.json(featureCollection);  // Enviar la colección de features como GeoJSON
+    } else {
+      res.status(404).json({ error: 'No se encontraron polígonos' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al consultar la base de datos' });
+  }
+});
+
+
+
+
+
+
 let port = process.env.PORT;
 if (port == null || port == '') {
   port = 5000;
