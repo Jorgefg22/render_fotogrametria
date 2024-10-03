@@ -19,67 +19,31 @@ fetch('https://migeoportalsacaba.onrender.com/poligonos')
   .then(data => {
     let geojsonLayer = L.geoJSON(data, {
       style: function (feature) {
-        let fillColor;
-
-        if (feature.properties.estado_acumulativo == 0) {
-          fillColor = '#ababab';
-        } else if (feature.properties.estado_acumulativo == 1) {
-          fillColor = '#ff540b';
-        } else if (feature.properties.estado_acumulativo == 2) {
-          fillColor = '#fdec03';
-        } else if (feature.properties.estado_acumulativo == 3) {
-          fillColor = '#1eca00';
-        } else if (feature.properties.estado_acumulativo == 4) {
-          fillColor = '#0c45d6';
-        }
-
         return {
-          fillColor: fillColor,
-          weight: 2, 
+          fillColor: '#ff540b',
+          weight: 2,
           color: '#0d6efd',
           fillOpacity: 0.5
         };
       },
       onEachFeature: function (feature, layer) {
-        if (feature.properties && feature.properties.distrito_a) {
-          var statuslev = "";
-          if (feature.properties.estado_acumulativo == 1) {
-            statuslev = "Levantamiento";
-          } else if (feature.properties.estado_acumulativo == 2) {
-            statuslev = "Procesamiento";
-          } else if (feature.properties.estado_acumulativo == 3) {
-            statuslev = "Post procesamiento";
-          } else if (feature.properties.estado_acumulativo == 4) {
-            statuslev = "Publicado";
-          }
-
-          var fechalev = "<p>Fecha de levantamiento: " + feature.properties.fecha_levantamiento + "</p>";
-          var filename = feature.properties.texto + ".ecw";
-          var buton2d = '';
-          var buton3d = '';
-          var btnsoliciud = '';
-
-          if (feature.properties.estado_acumulativo == 4) {
-            buton2d = '<a href="/users/descargar/' + filename + '" class="btn btn-primary text-white btn-sm" role="button">Ortomosaico 2D</a>';
-            buton3d = '<button class="btn btn-warning btn-sm" id="btnAgregarScript" onclick="addscript(' + feature.properties.texto + ')">Nube de Puntos 3D</button>';
-          }
-          if (feature.properties.estado_acumulativo == 0) {
-            btnsoliciud = '<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#descargasModal2" onclick="addGrillaSolev(' + feature.properties.texto + ')">Solicitar Levantamiento</button>';
-          }
-
+        if (feature.properties && feature.properties.id) {
           layer.bindPopup('<div><img src="/images/adt.png" width="300px" alt=""></div>' +
-                          '<div><h6>Gobierno Autonomo Municipal de Sacaba</h6>' +
-                          '<p>Distrito: ' + feature.properties.distrito_a + '</p>' +
-                          '<p>Grilla numero: <label id="numgrilla">' + feature.properties.texto + '</label></p>' +
-                          '<p>Estado: ' + statuslev + '</p>' + fechalev + 
-                          '</div><div style="text-align: center;">' + buton2d + buton3d + btnsoliciud + '</div>');
+            '<div><h6>Gobierno Autonomo Municipal de Sacaba</h6>' +
+            '<p>Codigo Catastral: ' + feature.properties.codigo_cat + '</p>' +
+            '<p>Numero de Inmueble: ' + feature.properties.nro_inmueb + '</p>' +
+            '<p>Distrito Catastral: ' + feature.properties.distrito_c + '</p>' +
+            '<p>Distrito Administrativo: ' + feature.properties.distrito_a + '</p>' +
+            '<p>Nro de tramite: ' + feature.properties.nro_tramit + '</p>' +
+            '<p>Numero de zona: ' + feature.properties.zona + '</p>');
+
         }
 
         let center = layer.getBounds().getCenter();
         let label = L.marker(center, {
           icon: L.divIcon({
             className: 'label',
-            html: feature.properties.texto,
+            html: feature.properties.id,
             iconSize: [40, 20]
           })
         });
@@ -92,7 +56,7 @@ fetch('https://migeoportalsacaba.onrender.com/poligonos')
     map.on('zoomend', function () {
       let zoom = map.getZoom();
       geojsonLayer.eachLayer(function (layer) {
-        if (zoom >= 15) {
+        if (zoom >= 19) {
           if (!map.hasLayer(layer.label)) {
             map.addLayer(layer.label);
           }
@@ -106,7 +70,9 @@ fetch('https://migeoportalsacaba.onrender.com/poligonos')
 
     // Ejecutar el evento una vez para establecer el estado inicial
     map.fire('zoomend');
-  });
+  })
+  .catch(error => console.error('Error al cargar el GeoJSON:', error));
+
 
 
 document.getElementById('fileInput').addEventListener('change', function (e) {

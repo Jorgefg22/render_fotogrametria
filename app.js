@@ -395,9 +395,8 @@ app.get('/users/descargados', checkNotAuthenticated, async (req, res) => {
 app.get('/poligonos', async (req, res) => {
   try {
     const query = `
-      SELECT id, ST_AsGeoJSON(ST_Transform(geom, 4326)) AS geom, texto, distrito_a, estado_acumulativo, fecha_levantamiento
-      FROM public.grilla2024
-    `;
+      SELECT id, ST_AsGeoJSON(ST_Transform(geom, 4326)) AS geom, objectid, codigo_cat, nro_inmueb, distrito_a,distrito_c,distrito_a,clase,tipo_emp,ubicacion,temporal,fijo,fecha,direccion_,tecnico,
+      nro_tramit,zona,zonadr FROM public.predios` ;
     const result = await pool.query(query);
 
     if (result.rows.length > 0) {
@@ -409,10 +408,22 @@ app.get('/poligonos', async (req, res) => {
           geometry: JSON.parse(row.geom),  // GeoJSON Geometry
           properties: {
             id: row.id,
-            texto: row.texto,
+            objectid: row.objectid,
+            codigo_cat: row.codigo_cat,
+            nro_inmueb: row.nro_inmueb,
             distrito_a: row.distrito_a,
-            estado_acumulativo: row.estado_acumulativo,
-            fecha_levantamiento: row.fecha_levantamiento
+            distrito_c: row.distrito_c,
+                 clase: row.clase,
+              tipo_emp: row.tipo_emp,
+             ubicacion: row.ubicacion,
+            temporal: row.temporal,
+            fijo: row.fijo,
+            fecha: row.fecha,
+            direccion_: row.direccion_,
+            tecnico: row.tecnico,
+            nro_tramit: row.nro_tramit,
+            zona: row.zona,
+            zonadr: row.zonadr  
           }
         }))
       };
