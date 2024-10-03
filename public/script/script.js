@@ -14,7 +14,7 @@ L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
 
 
 
-fetch('http://localhost:5000/poligonos')
+fetch('https://migeoportalsacaba.onrender.com/poligonos')
   .then(response => response.json())
   .then(data => {
     let geojsonLayer = L.geoJSON(data, {
