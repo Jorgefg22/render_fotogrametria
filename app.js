@@ -1,3 +1,7 @@
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+const LargeObjectManager = require('pg-large-object').LargeObjectManager;
+
 const express = require('express');
 const app = express();
 const { pool } = require('./config');
@@ -439,6 +443,105 @@ app.get('/poligonos', async (req, res) => {
 });
 
 
+// Ruta para manejar la subida de imágenes y asociarlas a un predio
+app.post('/upload', upload.single('image'), (req, res) => {
+  const filePath = req.file.path;
+  const fileName = req.file.originalname;
+  const predioId = req.body.codigo_cat;
+
+  pool.connect((err, client, done) => {
+    if (err) throw err;
+
+    client.query('BEGIN', (err) => {
+      if (err) throw err;
+
+      const lom = new LargeObjectManager({ pg: client });
+
+      lom.createAndWritableStream((err, oid, stream) => {
+        if (err) throw err;
+
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(stream);
+
+        stream.on('finish', () => {
+          client.query('COMMIT', (err) => {
+            if (err) throw err;
+
+            client.query(
+              'INSERT INTO fotos (nombre, oid_imagen, codigo_cat) VALUES ($1, $2, $3)',
+              [fileName, oid, predioId],
+              (err, result) => {
+                if (err) throw err;
+
+                fs.unlink(filePath, (err) => {
+                  if (err) throw err;
+                  console.log(`Imagen subida para el predio con ID: ${predioId}`);
+                  res.redirect('/users/geoport');
+                  
+                });
+                done();
+              }
+            );
+          });
+        });
+      });
+    });
+  });
+});
+
+// Ruta para mostrar las imágenes asociadas a los predios
+app.get('/images', (req, res) => {
+  const predioId = req.query.codigo_cat;
+
+  pool.query(`
+    SELECT id, nombre, codigo_cat 
+    FROM fotos 
+    WHERE codigo_cat = $1
+  `, [predioId], (err, result) => {
+    if (err) throw err;
+
+    // Respuesta temporal en JSON para verificar la consulta
+    res.json(result.rows); 
+  });
+});
+
+
+
+// Ruta para ver una imagen específica
+app.get('/image/:id', (req, res) => {
+  const imageId = req.params.id;
+
+  pool.connect((err, client, done) => {
+    if (err) throw err;
+
+    client.query('SELECT nombre, oid_imagen FROM fotos WHERE id = $1', [imageId], (err, result) => {
+      if (err) throw err;
+
+      const imageName = result.rows[0].nombre;
+      const oid = result.rows[0].oid_imagen;
+
+      client.query('BEGIN', (err) => {
+        if (err) throw err;
+
+        const lom = new LargeObjectManager({ pg: client });
+
+        lom.openAndReadableStream(oid, (err, size, stream) => {
+          if (err) throw err;
+
+          res.setHeader('Content-Disposition', `attachment; filename=${imageName}`);
+          stream.pipe(res);
+
+          stream.on('end', () => {
+            client.query('COMMIT', (err) => {
+              if (err) throw err;
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+});
 
 
 

@@ -1,4 +1,5 @@
 let map = L.map('map').setView([-17.403868804926827, -66.03924367573562], 13)
+
 // numeroGrilla = "";
 //Agregar tilelAyer mapa base desde openstreetmap
 /*L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -14,7 +15,7 @@ L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
 
 
 
-fetch('https://migeoportalsacaba.onrender.com/poligonos')
+fetch('/poligonos')
   .then(response => response.json())
   .then(data => {
     let geojsonLayer = L.geoJSON(data, {
@@ -28,6 +29,7 @@ fetch('https://migeoportalsacaba.onrender.com/poligonos')
       },
       onEachFeature: function (feature, layer) {
         if (feature.properties && feature.properties.id) {
+         
           layer.bindPopup('<div><img src="/images/adt.png" width="300px" alt=""></div>' +
             '<div><h6>Gobierno Autonomo Municipal de Sacaba</h6>' +
             '<p>Codigo Catastral: ' + feature.properties.codigo_cat + '</p>' +
@@ -35,11 +37,13 @@ fetch('https://migeoportalsacaba.onrender.com/poligonos')
             '<p>Distrito Catastral: ' + feature.properties.distrito_c + '</p>' +
             '<p>Distrito Administrativo: ' + feature.properties.distrito_a + '</p>' +
             '<p>Nro de tramite: ' + feature.properties.nro_tramit + '</p>' +
-            '<p>Numero de zona: ' + feature.properties.zona + '</p>');
+            '<p>Numero de zona: ' + feature.properties.zona + '</p>'+
+            '<h6>Subir una imagen para un Predio</h6><form action="/upload" method="post" enctype="multipart/form-data"><label>Código Catastro del Predio: </label><span id="codigo_cat_display">'+ feature.properties.codigo_cat +'</span><label for="image">Selecciona una imagen:</label><input type="file" id="image" name="image" required><br><input type="hidden" id="codigo_cat" name="codigo_cat" value="'+ feature.properties.codigo_cat +'"><button type="submit">Subir Imagen</button></form>'+
+          '<button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"onclick="loadImages()"> Imágenes cargadas </button><div class="collapse" id="collapseExample"><div class="card card-body"><div><ul id="imagesList"></ul></div><div id="fotosDiv"></div></div></div>');
 
         }
 
-        let center = layer.getBounds().getCenter();
+        /*let center = layer.getBounds().getCenter();
         let label = L.marker(center, {
           icon: L.divIcon({
             className: 'label',
@@ -49,11 +53,11 @@ fetch('https://migeoportalsacaba.onrender.com/poligonos')
         });
 
         // Agregar el label al layer
-        layer.label = label;
+        layer.label = label;*/
       }
     }).addTo(map);
 
-    map.on('zoomend', function () {
+    /*map.on('zoomend', function () {
       let zoom = map.getZoom();
       geojsonLayer.eachLayer(function (layer) {
         if (zoom >= 19) {
@@ -66,10 +70,10 @@ fetch('https://migeoportalsacaba.onrender.com/poligonos')
           }
         }
       });
-    });
+    });*/
 
     // Ejecutar el evento una vez para establecer el estado inicial
-    map.fire('zoomend');
+    //map.fire('zoomend');
   })
   .catch(error => console.error('Error al cargar el GeoJSON:', error));
 
@@ -367,3 +371,58 @@ function addGrillaSolev(numeroGrilla) {
   console.log("el numero de grilla es " + numeroGrilla);
 
 }
+
+function loadImages() {
+  // Cambia el valor por el código que necesites, o pásalo como parámetro
+  const codigoCat = document.getElementById('codigo_cat').value; // Ejemplo: reemplaza con el valor real
+  
+ console.log(" este es el codigo cat :" + codigoCat)
+  fetch(`/images?codigo_cat=${codigoCat}`)
+    .then(response => response.json())
+    .then(images => {
+      // Obtén el elemento de la lista de imágenes
+      const imagesList = document.getElementById("imagesList");
+      
+      // Limpia cualquier contenido previo en la lista
+      imagesList.innerHTML = "";
+
+      // Añade cada imagen como un elemento de lista
+      images.forEach(image => {
+        const listItem = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = `/image/${image.id}`;
+        link.textContent = image.nombre;
+        listItem.appendChild(link);
+        imagesList.appendChild(listItem);
+      });
+    })
+    .catch(error => console.error("Error al cargar las imágenes:", error));
+  }
+
+
+  async function mostrarFotos() {
+    const codigoCat = document.getElementById('codigo_cat').value; // Ejemplo: reemplaza con el valor real
+    try {
+      // Realiza la solicitud al endpoint
+      const response = await fetch(`/images?codigo_cat=${codigoCat}`);
+      const fotos = await response.json();
+
+      // Selecciona el div donde se mostrarán los datos
+      const fotosDiv = document.getElementById("fotosDiv");
+      
+      // Crea una lista de los datos y los inserta en el div
+      fotos.forEach(foto => {
+        const fotoElement = document.createElement("div");
+        fotoElement.innerHTML = `
+          <p><strong>ID:</strong> ${foto.id}</p>
+          <p><strong>Nombre:</strong> ${foto.nombre}</p>
+          <p><strong>OID Imagen:</strong> ${foto.oid_imagen}</p>
+          <p><strong>Predio ID:</strong> ${foto.codigo_cat}</p>
+          <hr>
+        `;
+        fotosDiv.appendChild(fotoElement);
+      });
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+    }
+  }
