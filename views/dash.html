@@ -1,31 +1,84 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Leaflet Map with Sidebar and Dashboard</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.css" />
     <style>
-        #map { height: 100vh; width: 70vw; float: left; }
-        #dashboard { height: 100vh; width: 30vw; float: right; padding: 20px; }
+        #map {
+            height: 100vh;
+            width: 70vw;
+            float: left;
+        }
+
+        #dashboard {
+            height: 100vh;
+            width: 30vw;
+            float: right;
+            padding: 20px;
+        }
     </style>
 </head>
+
 <body>
     <div id="map"></div>
     <div id="dashboard">
         <h2>Statistics Dashboard</h2>
         <canvas id="statsChart"></canvas>
     </div>
-    
+
+    <div class="leaflet-pane leaflet-popup-pane">
+        <div class="leaflet-popup  leaflet-zoom-animated"
+            style="opacity: 1; transform: translate3d(1717px, -121px, 0px); bottom: -7px; left: -171px;">
+            <div class="leaflet-popup-content-wrapper">
+                <div class="leaflet-popup-content" style="width: 301px;">
+                    <div><img src="/images/adt.png" width="300px" alt=""></div>
+                    <div>
+                        <h6>Gobierno Autonomo Municipal de Sacaba</h6>
+                        <p>Codigo Catastral: 0905100001000</p>
+                        <p>Numero de Inmueble: 1530008418</p>
+                        <p>Distrito Catastral: 4</p>
+                        <p>Distrito Administrativo: 4</p>
+                        <p>Nro de tramite: CAT 594-23</p>
+                        <p>Numero de zona: null</p>
+                        <h6>Subir una imagen para un Predio</h6>
+                        <form action="/upload" method="post" enctype="multipart/form-data"><label>Código Catastro del
+                                Predio: </label><span id="codigo_cat_display">0905100001000</span><label
+                                for="image">Selecciona una imagen:</label><input type="file" id="image" name="image"
+                                required=""><br><input type="hidden" id="codigo_cat" name="codigo_cat"
+                                value="0905100001000"><button type="submit">Subir Imagen</button></form><button
+                            class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"
+                            onclick="loadImages()"> Imágenes cargadas </button>
+                        <div class="collapse" id="collapseExample">
+                            <div class="card card-body">
+                                <div>
+                                    <ul id="imagesList"></ul>
+                                </div>
+                                <div id="fotosDiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="leaflet-popup-tip-container">
+                <div class="leaflet-popup-tip"></div>
+            </div><a class="leaflet-popup-close-button" href="#close">×</a>
+        </div>
+    </div>
+
+
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         var map = L.map('map').setView([-17.403868804926827, -66.03924367573562], 13);
-        
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
         }).addTo(map);
-        
+
         // Replace this with the URL of your GeoJSON file on GitHub
         var geojsonUrl = 'http://10.0.38.17:8080/geoserver/fotogrametria_sacaba/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=fotogrametria_sacaba%3AGrilla%20Area%20Urbana%202024&maxFeatures=500&outputFormat=application%2Fjson&srsName=EPSG:4326'
 
@@ -49,7 +102,7 @@
                     "LL": 0
                 };
 
-                geojsonData.features.forEach(function(feature) {
+                geojsonData.features.forEach(function (feature) {
                     var distrito = feature.properties.distrito_a;
                     if (dataCounts[distrito] !== undefined) {
                         dataCounts[distrito]++;
@@ -60,7 +113,7 @@
                     labels: labels,
                     datasets: [{
                         label: 'Estado Acumulativo',
-                        data: labels.map(function(label) { return dataCounts[label]; }),
+                        data: labels.map(function (label) { return dataCounts[label]; }),
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
@@ -91,4 +144,5 @@
         }
     </script>
 </body>
+
 </html>
