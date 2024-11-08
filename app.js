@@ -444,7 +444,7 @@ app.get('/poligonos', async (req, res) => {
 
 
 // Ruta para manejar la subida de imágenes y asociarlas a un predio
-app.post('/upload', upload.single('image'), (req, res) => {
+/*app.post('/upload', upload.single('image'), (req, res) => {
   const filePath = req.file.path;
   const fileName = req.file.originalname;
   const predioId = req.body.codigo_cat;
@@ -487,7 +487,52 @@ app.post('/upload', upload.single('image'), (req, res) => {
       });
     });
   });
+});*/
+
+app.post('/upload', upload.single('image'), (req, res) => {
+  const filePath = req.file.path;
+  const fileName = req.file.originalname;
+  const predioId = req.body.codigo_cat;
+
+  pool.connect((err, client, done) => {
+    if (err) return res.json({ message: 'Error en la conexión a la base de datos' });
+
+    client.query('BEGIN', (err) => {
+      if (err) return res.json({ message: 'Error al iniciar la transacción' });
+
+      const lom = new LargeObjectManager({ pg: client });
+
+      lom.createAndWritableStream((err, oid, stream) => {
+        if (err) return res.json({ message: 'Error al crear el stream' });
+
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(stream);
+
+        stream.on('finish', () => {
+          client.query('COMMIT', (err) => {
+            if (err) return res.json({ message: 'Error al confirmar la transacción' });
+
+            client.query(
+              'INSERT INTO fotos (nombre, oid_imagen, codigo_cat) VALUES ($1, $2, $3)',
+              [fileName, oid, predioId],
+              (err, result) => {
+                if (err) return res.json({ message: 'Error al insertar la imagen en la base de datos' });
+
+                fs.unlink(filePath, (err) => {
+                  if (err) return res.json({ message: 'Error al eliminar el archivo temporal' });
+                  console.log(`Imagen subida para el predio con ID: ${predioId}`);
+                  res.json({ message: 'Imagen subida exitosamente' });
+                });
+                done();
+              }
+            );
+          });
+        });
+      });
+    });
+  });
 });
+
 
 // Ruta para mostrar las imágenes asociadas a los predios
 app.get('/images', (req, res) => {

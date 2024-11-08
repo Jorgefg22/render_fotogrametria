@@ -31,15 +31,16 @@ fetch('/poligonos')
         if (feature.properties && feature.properties.id) {
          
           layer.bindPopup('<div><img src="/images/adt.png" width="300px" alt=""></div>' +
-            '<div><h6>Gobierno Autonomo Municipal de Sacaba</h6>' +
-            '<p>Codigo Catastral: ' + feature.properties.codigo_cat + '</p>' +
-            '<p>Numero de Inmueble: ' + feature.properties.nro_inmueb + '</p>' +
-            '<p>Distrito Catastral: ' + feature.properties.distrito_c + '</p>' +
-            '<p>Distrito Administrativo: ' + feature.properties.distrito_a + '</p>' +
-            '<p>Nro de tramite: ' + feature.properties.nro_tramit + '</p>' +
-            '<p>Numero de zona: ' + feature.properties.zona + '</p>'+
-            '<h6>Subir una imagen para un Predio</h6><form action="/upload" method="post" enctype="multipart/form-data"><label>Código Catastro del Predio: </label><span id="codigo_cat_display">'+ feature.properties.codigo_cat +'</span><label for="image">Selecciona una imagen:</label><input type="file" id="image" name="image" required><br><input type="hidden" id="codigo_cat" name="codigo_cat" value="'+ feature.properties.codigo_cat +'"><button type="submit">Subir Imagen</button></form>'+
-          '<button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"onclick="loadImages()"> Imágenes cargadas </button><div class="collapse" id="collapseExample"><div class="card card-body"><div><ul id="imagesList"></ul></div><div id="fotosDiv"></div></div></div>');
+            //'<div><h6><strong>Gobierno Autonomo Municipal de Sacaba</strong></h6>' +
+            '<p><strong>Codigo Catastral: </strong>' + feature.properties.codigo_cat  +
+            '<br><strong>Numero de Inmueble: </strong>' + feature.properties.nro_inmueb + 
+            '<br><strong>Distrito Catastral: </strong>' + feature.properties.distrito_c +
+            '<br><strong>Distrito Administrativo: </strong>' + feature.properties.distrito_a +
+            '<br><strong>Nro de tramite: </strong>' + feature.properties.nro_tramit +
+            '<br><strong>Numero de zona: </strong>' + feature.properties.zona + '</p>'+
+            '<form id="uploadForm" enctype="multipart/form-data"><label>Código Catastro del Predio: </label><span id="codigo_cat_display">'+ feature.properties.codigo_cat +'</span> <label for="image">Seleccionar imagenes:</label> <input type="hidden" id="codigo_cat" name="codigo_cat"value="'+ feature.properties.codigo_cat +'"><div class="input-group input-group-sm mb-3"><input type="file" class="form-control" id="inputGroup-sizing-sm image " name="image" required; aria-describedby="inputGroup-sizing-sm" aria-label="Sizing example input Upload"> <button class="btn btn-outline-secondary btn-sm" type="button" id="inputGroupFileAddon04" onclick="uploadImage()" style="background-color:#dde0e3"><i class="fa-solid fa-upload" style="color: #2d2e2e;"></i></button></div></form><div id="message"></div>'+
+            //'<form id="uploadForm" enctype="multipart/form-data"><label>Código Catastro del Predio: </label><span id="codigo_cat_display">'+ feature.properties.codigo_cat +'</span><label for="image">Seleccionar imagenes:</label><input type="hidden" id="codigo_cat" name="codigo_cat" value="'+ feature.properties.codigo_cat +'"><input type="file" id="image" name="image" required;><button type="button" onclick="uploadImage()">Subir Imagen</button></form><div id="message"></div>'+
+          '<button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"onclick="loadImages()" style="width:100%"> Imágenes cargadas </button><div class="collapse" id="collapseExample"><div class="card card-body"><div><ul id="imagesList"></ul></div><div id="fotosDiv"></div></div></div>');
 
         }
 
@@ -306,7 +307,7 @@ fetch('/leaflet/distritos_admin.geojson')
   .catch(error => console.error('Error cargando el archivo GeoJSON:', error));
 
 
-var legend = L.control({ position: 'bottomright' });
+/*var legend = L.control({ position: 'bottomright' });
 
 legend.onAdd = function (map) {
   var div = L.DomUtil.create('div', 'legend');
@@ -318,7 +319,7 @@ legend.onAdd = function (map) {
   return div;
 };
 
-legend.addTo(map);
+legend.addTo(map);/*/
 
 fetch('/messages')
   .then(response => response.json())
@@ -426,3 +427,39 @@ function loadImages() {
       console.error("Error al obtener los datos:", error);
     }
   }
+
+  function uploadImage() {
+    const form = document.getElementById('uploadForm');
+    const formData = new FormData(form);
+    const messageElement = document.getElementById('message');
+    const fileInput = document.getElementById('image');
+  
+    fetch('/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Muestra el mensaje del servidor
+        messageElement.textContent = data.message;
+  
+        // Limpia el campo de archivo
+        fileInput.value = '';
+  
+        // Oculta el mensaje después de 3 segundos
+        setTimeout(() => {
+          messageElement.textContent = '';
+        }, 2000);
+      })
+      .catch((error) => {
+        messageElement.textContent = 'Error al subir la imagen';
+        console.error('Error:', error);
+  
+        // Oculta el mensaje de error después de 3 segundos
+        setTimeout(() => {
+          messageElement.textContent = '';
+        }, 3000);
+      });
+  }
+  
+  
